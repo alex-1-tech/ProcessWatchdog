@@ -1,29 +1,13 @@
-#include "core/processmonitor.h"
-#include "threads/datacollection.h"
-#include <iostream>
-#include <mutex>
+#include <QApplication>
+#include "gui/mainwindow.h"
 
-std::mutex printMutex;
+int main(int argc, char *argv[]) {
+    QApplication app(argc, argv);
 
-void updateProcessList() {
-    ProcessMonitor monitor;
-    auto processes = monitor.getProcessList();
+    MainWindow w;
+    w.setWindowTitle("Process Watchdog");
+    w.resize(600, 400);
+    w.show();
 
-    std::lock_guard<std::mutex> lock(printMutex);
-    system("clear");
-    std::cout << "Обновление списка процессов:\n";
-    for (const auto& proc : processes) {
-        std::cout << "PID: " << proc.pid << " | Name: " << proc.name << "\n";
-    }
-}
-
-int main() {
-    DataCollectorThread updater(2000, updateProcessList); 
-    updater.start();
-
-    std::cout << "\nНажмите Enter для выхода...\n";
-    std::cin.get();
-
-    updater.stop();
-    return 0;
+    return app.exec();
 }

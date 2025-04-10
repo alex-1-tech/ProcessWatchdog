@@ -1,16 +1,16 @@
 #pragma once
 
-#include <vector>
-#include <string>
+#include <QVector>
+#include <QString>
 
 struct ProcessInfo
 {
     int pid;
-    std::string name;
+    QString name;
 };
 
 class ProcessMonitor
 {
 public:
-    std::vector<ProcessInfo> getProcessList();
+    QVector<ProcessInfo> getProcessList();
 };

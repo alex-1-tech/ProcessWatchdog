@@ -7,5 +7,7 @@ build/
 *.tmp
 *.swp
 *.out
+
 .DS_Store
-.vscode/settings.json
+.vscode/
+.vscode/*

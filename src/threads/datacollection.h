@@ -1,25 +1,16 @@
 #pragma once
+#include <QObject>
+#include <QVector>
+#include "../core/processmonitor.h"
 
-#include <thread>
-#include <atomic>
-#include <functional>
-
-class DataCollectorThread
-{
+class DataCollection : public QObject {
+    Q_OBJECT
 public:
-    using Callback = std::function<void()>;
+    explicit DataCollection(QObject *parent = nullptr);
 
-    DataCollectorThread(int intervalMs, Callback callback);
-    ~DataCollectorThread();
+public slots:
+    void update();
 
-    void start();
-    void stop();
-
-private:
-    void run();
-
-    std::thread thread_;
-    std::atomic<bool> running_;
-    int intervalMs_;
-    Callback callback_;
+signals:
+    void processListUpdated(QVector<ProcessInfo> list);
 };

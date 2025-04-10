@@ -1,44 +1,24 @@
 #include "processmonitor.h"
-#include <dirent.h>
-#include <fstream>
-#include <iostream>
-#include <cstring>
-#include <cctype>
-#include <algorithm>
+#include <QDir>
+#include <QFile>
+#include <QTextStream>
+#include <QRegularExpression>
 
-std::vector<ProcessInfo> ProcessMonitor::getProcessList()
-{
-    std::vector<ProcessInfo> processes;
+QVector<ProcessInfo> ProcessMonitor::getProcessList() {
+    QVector<ProcessInfo> list;
+    QDir procDir("/proc");
 
-    DIR *procDir = opendir("/proc");
-    if (!procDir)
-    {
-        perror("opendir(/proc)");
-        return processes;
-    }
-
-    struct dirent *entry;
-    while ((entry = readdir(procDir)) != nullptr)
-    {
-        if (entry->d_type == DT_DIR)
-        {
-            const char *name = entry->d_name;
-            if (std::all_of(name, name + strlen(name), ::isdigit))
-            {
-                int pid = std::stoi(name);
-                std::string commPath = "/proc/" + std::to_string(pid) + "/comm";
-                std::ifstream commFile(commPath);
-                std::string processName;
-
-                if (commFile.is_open())
-                {
-                    std::getline(commFile, processName);
-                    processes.push_back({pid, processName});
-                }
+    for (const QString &entry : procDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot)) {
+        if (entry.toInt() > 0) {
+            QString commPath = "/proc/" + entry + "/comm";
+            QFile file(commPath);
+            if (file.open(QIODevice::ReadOnly)) {
+                QTextStream in(&file);
+                QString name = in.readLine();
+                list.append({ entry.toInt(), name });
             }
         }
     }
 
-    closedir(procDir);
-    return processes;
+    return list;
 }
