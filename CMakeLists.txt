@@ -8,27 +8,41 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-find_package(Qt5 REQUIRED COMPONENTS Core Widgets Gui Concurrent)
-
+find_package(Qt5 REQUIRED COMPONENTS Core Widgets Gui Concurrent Test)
 find_package(Boost REQUIRED)
 
-include_directories(
-    src/
-)
+enable_testing()
+
+include_directories(src/)
 
 file(GLOB_RECURSE SOURCES
     "src/*.cpp"
     "src/*.h"
 )
 
-add_executable(${PROJECT_NAME} ${SOURCES})
-
-target_link_libraries(
-    ${PROJECT_NAME} 
-    Qt5::Core 
-    Qt5::Widgets 
-    Qt5::Gui
-    Qt5::Concurrent
+file(GLOB_RECURSE TEST_SOURCES
+    "tests/*.cpp"
+    "tests/*.h"
 )
 
-target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES})
+add_library(proc_core ${SOURCES})
+target_link_libraries(proc_core
+    Qt5::Core
+    Qt5::Gui
+    Qt5::Widgets
+    Qt5::Concurrent
+    ${Boost_LIBRARIES}
+)
+target_include_directories(proc_core PUBLIC src/)
+
+add_executable(${PROJECT_NAME} src/main.cpp)
+target_link_libraries(${PROJECT_NAME} proc_core)
+
+add_executable(unit_tests ${TEST_SOURCES})
+target_include_directories(unit_tests PRIVATE tests/)
+target_link_libraries(unit_tests
+    proc_core
+    Qt5::Test
+)
+
+add_test(NAME unit_tests COMMAND unit_tests)
