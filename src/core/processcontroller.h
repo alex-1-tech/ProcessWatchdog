@@ -1,6 +1,8 @@
 #pragma once
 
 #include <QObject>
+#include <QVector>
+#include <QFutureWatcher>
 #include "core/processmonitor.h"
 
 class ProcessController : public QObject
@@ -16,4 +18,6 @@ public slots:
 signals:
     void processListReady(QVector<ProcessInfo> list);
     void actionResult(int pid, const QString &action, bool success);
+private:
+    QFutureWatcher<QVector<ProcessInfo>> watcher;
 };
