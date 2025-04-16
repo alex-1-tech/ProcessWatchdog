@@ -9,8 +9,34 @@ ProcessViewModel::ProcessViewModel(QObject *parent)
 
 void ProcessViewModel::updateProcessList(const QVector<ProcessInfo> &list)
 {
-    fullProcessList = list;
-    filterByName(currentFilter);
+    QMap<int, QString> newMap;
+    for(const auto& proc: list)
+        newMap[proc.pid] = proc.name;
+
+    for(int row = rowCount() - 1; row >= 0; --row){
+        int pid = item(row, 0)->text().toInt();
+        if(!newMap.contains(pid)){
+            removeRow(row);
+            cachedProcesses.remove(pid);
+        }
+    }
+
+    for (const auto& [pid, name] : newMap.toStdMap()) {
+        if (cachedProcesses.contains(pid)) {
+            if (cachedProcesses[pid] != name) {
+                for (int row = 0; row < rowCount(); ++row) {
+                    if (item(row, 0)->text().toInt() == pid) {
+                        item(row, 1)->setText(name);
+                        break;
+                    }
+                }
+                cachedProcesses[pid] = name;
+            }
+        } else {
+            addProcessRow(pid, name);
+            cachedProcesses[pid] = name;
+        }
+    }
 }
 
 void ProcessViewModel::filterByName(const QString &filter)

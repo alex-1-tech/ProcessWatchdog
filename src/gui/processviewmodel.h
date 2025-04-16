@@ -24,4 +24,5 @@ private:
 
     QVector<ProcessInfo> fullProcessList;
     QString currentFilter;
+    QMap<int, QString> cachedProcesses;
 };
