@@ -3,7 +3,7 @@
 #include <QMainWindow>
 #include <QTableView>
 #include <QLineEdit>
-#include "threads/datacollection.h"
+#include "core/processcontroller.h"
 #include "gui/processviewmodel.h"
 
 class MainWindow : public QMainWindow
@@ -16,12 +16,11 @@ public:
 
 private slots:
     void onProcessListUpdated(QVector<ProcessInfo> list);
-    void onProcessAction(int pid, const QString &action);
     void onRequestActionWidget(const QModelIndex &index, int pid);
-
+    void onActionResult(int pid, const QString &action, bool success);
 private:
     ProcessViewModel *model;
-    DataCollection *worker;
+    ProcessController *controller;;
     QTableView *tableView;
     QLineEdit *searchEdit;
 };

@@ -11,9 +11,9 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
       model(new ProcessViewModel(this)),
-      worker(new DataCollection(this)),
-      tableView(new QTableView(this))
-{
+      controller(new ProcessController(this)),
+      tableView(new QTableView(this)),
+      searchEdit(new QLineEdit(this)) {
 
     tableView->setModel(model);
     tableView->horizontalHeader()->setStretchLastSection(true);
@@ -21,31 +21,33 @@ MainWindow::MainWindow(QWidget *parent)
 
     auto *widget = new QWidget;
     auto *layout = new QVBoxLayout(widget);
+
+    searchEdit->setPlaceholderText("Поиск по имени или PID процесса...");
+    layout->addWidget(searchEdit);
     layout->addWidget(tableView);
+
     setCentralWidget(widget);
 
-    connect(worker, &DataCollection::processListUpdated,
+    connect(searchEdit, &QLineEdit::textChanged,
+            model, &ProcessViewModel::setSearchFilter);
+
+    connect(controller, &ProcessController::processListReady,
             model, &ProcessViewModel::updateProcessList);
 
     connect(model, &ProcessViewModel::processAction,
-            this, &MainWindow::onProcessAction);
+            controller, &ProcessController::handleProcessAction);
+
+    connect(controller, &ProcessController::actionResult,
+            this, &MainWindow::onActionResult);
 
     connect(model, &ProcessViewModel::requestActionWidget,
             this, &MainWindow::onRequestActionWidget);
 
-    worker->update();
+    controller->refreshProcesses();
 
     QTimer *timer = new QTimer(this);
-    connect(timer, &QTimer::timeout, worker, &DataCollection::update);
+    connect(timer, &QTimer::timeout, controller, &ProcessController::refreshProcesses);
     timer->start(2000);
-
-    searchEdit = new QLineEdit;
-    searchEdit->setPlaceholderText("Поиск по pid или имени процесса...");
-    layout->addWidget(searchEdit);
-    layout->addWidget(tableView);
-
-    connect(searchEdit, &QLineEdit::textChanged, model,
-            &ProcessViewModel::filterByName);
 }
 
 MainWindow::~MainWindow() {}
@@ -55,29 +57,10 @@ void MainWindow::onProcessListUpdated(QVector<ProcessInfo> list)
     model->updateProcessList(list);
 }
 
-void MainWindow::onProcessAction(int pid, const QString &action)
-{
-    bool success = false;
-
-    if (action == "kill")
-    {
-        success = ProcessManager::killProcess(pid);
-    }
-    else if (action == "stop")
-    {
-        success = ProcessManager::stopProcess(pid);
-    }
-    else if (action == "continue")
-    {
-        success = ProcessManager::continueProcess(pid);
-    }
-
-    if (success)
-    {
+void MainWindow::onActionResult(int pid, const QString &action, bool success) {
+    if (success) {
         qDebug() << "Action" << action << "for PID" << pid << "was successful!";
-    }
-    else
-    {
+    } else {
         qDebug() << "Action" << action << "for PID" << pid << "failed!";
     }
 }

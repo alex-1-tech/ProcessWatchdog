@@ -10,15 +10,18 @@ class ProcessViewModel : public QStandardItemModel
 public:
     explicit ProcessViewModel(QObject *parent = nullptr);
     void updateProcessList(const QVector<ProcessInfo> &list);
+    void setSearchFilter(const QString &filter);
 
 public slots:
     void filterByName(const QString &filter);
 
 signals:
     void processAction(int pid, const QString &action);
-    void requestActionWidget(const QModelIndex &index, int pid); // Сигнал, чтобы MainWindow добавил кнопки
+    void requestActionWidget(const QModelIndex &index, int pid);
 
 private:
     void addProcessRow(int pid, const QString &name);
+
     QVector<ProcessInfo> fullProcessList;
+    QString currentFilter;
 };

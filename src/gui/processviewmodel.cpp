@@ -10,11 +10,12 @@ ProcessViewModel::ProcessViewModel(QObject *parent)
 void ProcessViewModel::updateProcessList(const QVector<ProcessInfo> &list)
 {
     fullProcessList = list;
-    filterByName("");
+    filterByName(currentFilter);
 }
 
 void ProcessViewModel::filterByName(const QString &filter)
-{
+{   
+    currentFilter = filter;
     clear();
     setHorizontalHeaderLabels({"PID", "Name", "Actions"});
 
@@ -38,4 +39,8 @@ void ProcessViewModel::addProcessRow(int pid, const QString &name)
     appendRow({pidItem, nameItem, actionItem});
 
     emit requestActionWidget(index(rowCount() - 1, 2), pid);
+}
+
+void ProcessViewModel::setSearchFilter(const QString &filter) {
+    filterByName(filter);
 }
