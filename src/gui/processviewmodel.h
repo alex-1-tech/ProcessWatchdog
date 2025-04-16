@@ -1,0 +1,20 @@
+#pragma once
+
+#include <QStandardItemModel>
+#include "core/processmonitor.h"
+
+class ProcessViewModel : public QStandardItemModel
+{
+    Q_OBJECT
+
+public:
+    explicit ProcessViewModel(QObject *parent = nullptr);
+    void updateProcessList(const QVector<ProcessInfo> &list);
+
+signals:
+    void processAction(int pid, const QString &action);
+    void requestActionWidget(const QModelIndex &index, int pid); // Сигнал, чтобы MainWindow добавил кнопки
+
+private:
+    void addProcessRow(int pid, const QString &name);
+};

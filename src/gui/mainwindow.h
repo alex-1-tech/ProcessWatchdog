@@ -1,10 +1,12 @@
 #pragma once
-#include <QMainWindow>
-#include <QTimer>
-#include "../threads/datacollection.h"
-#include <QStandardItemModel>
 
-class MainWindow : public QMainWindow {
+#include <QMainWindow>
+#include <QTableView>
+#include "threads/datacollection.h"
+#include "gui/processviewmodel.h"
+
+class MainWindow : public QMainWindow
+{
     Q_OBJECT
 
 public:
@@ -13,9 +15,11 @@ public:
 
 private slots:
     void onProcessListUpdated(QVector<ProcessInfo> list);
+    void onProcessAction(int pid, const QString &action);
+    void onRequestActionWidget(const QModelIndex &index, int pid);
 
 private:
-    QStandardItemModel *model;
-    QTimer *updateTimer;
+    ProcessViewModel *model;
     DataCollection *worker;
+    QTableView *tableView;
 };

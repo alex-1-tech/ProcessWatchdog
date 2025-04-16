@@ -1,9 +1,10 @@
 #pragma once
 #include <QObject>
 #include <QVector>
-#include "../core/processmonitor.h"
+#include "core/processmonitor.h"
 
-class DataCollection : public QObject {
+class DataCollection : public QObject
+{
     Q_OBJECT
 public:
     explicit DataCollection(QObject *parent = nullptr);
