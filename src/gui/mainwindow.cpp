@@ -38,6 +38,14 @@ MainWindow::MainWindow(QWidget *parent)
     QTimer *timer = new QTimer(this);
     connect(timer, &QTimer::timeout, worker, &DataCollection::update);
     timer->start(2000);
+
+    searchEdit = new QLineEdit;
+    searchEdit->setPlaceholderText("Поиск по pid или имени процесса...");
+    layout->addWidget(searchEdit);
+    layout->addWidget(tableView);
+
+    connect(searchEdit, &QLineEdit::textChanged, model,
+            &ProcessViewModel::filterByName);
 }
 
 MainWindow::~MainWindow() {}

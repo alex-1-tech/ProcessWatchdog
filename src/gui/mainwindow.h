@@ -2,6 +2,7 @@
 
 #include <QMainWindow>
 #include <QTableView>
+#include <QLineEdit>
 #include "threads/datacollection.h"
 #include "gui/processviewmodel.h"
 
@@ -22,4 +23,5 @@ private:
     ProcessViewModel *model;
     DataCollection *worker;
     QTableView *tableView;
+    QLineEdit *searchEdit;
 };

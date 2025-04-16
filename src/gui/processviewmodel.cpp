@@ -9,12 +9,23 @@ ProcessViewModel::ProcessViewModel(QObject *parent)
 
 void ProcessViewModel::updateProcessList(const QVector<ProcessInfo> &list)
 {
-    clear();
-    setHorizontalHeaderLabels({"PID", "Name", "Actions"}); // Восстановить заголовки
+    fullProcessList = list;
+    filterByName("");
+}
 
-    for (const ProcessInfo &proc : list)
+void ProcessViewModel::filterByName(const QString &filter)
+{
+    clear();
+    setHorizontalHeaderLabels({"PID", "Name", "Actions"});
+
+    for (const ProcessInfo &proc : fullProcessList)
     {
-        addProcessRow(proc.pid, proc.name);
+        QString pidStr = QString::number(proc.pid);
+        if (proc.name.contains(filter, Qt::CaseInsensitive) ||
+    pidStr.contains(filter))
+        {
+            addProcessRow(proc.pid, proc.name);
+        }
     }
 }
 
